@@ -1,5 +1,4 @@
-/*package com.example.demo.config.security;
-
+package com.example.demo.config.security;
 
 import com.example.demo.model.UserModel;
 import com.example.demo.repository.UserRepository;
@@ -12,18 +11,23 @@ import org.springframework.stereotype.Service;
 @Service
 public class UserDetailsServiceImpl implements UserDetailsService {
 
-        final UserRepository userRepository;
+    final UserRepository userRepository;
 
-        public UserDetailsServiceImpl(UserRepository userRepository) {
-            this.userRepository = userRepository;
+    public UserDetailsServiceImpl(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
+
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        // Altere aqui para buscar pelo email, já que o Spring passa o identificador (email) como username
+        UserDetails user = userRepository.findByEmail(username);
+
+        if (user == null) {
+            throw new UsernameNotFoundException("User Not Found with email: " + username);
         }
 
-        @Override
-        public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-            UserModel userModel = userRepository.findByUsername(username)
-                    .orElseThrow(() -> new UsernameNotFoundException("User Not Found with username: " + username));
-            return new User(userModel.getUsername(), userModel.getPassword(), true, true, true, true, userModel.getAuthorities());
-        }
-}*/
+        return user;
+    }
+}
 
 

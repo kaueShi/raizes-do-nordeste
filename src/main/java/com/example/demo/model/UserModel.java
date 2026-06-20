@@ -24,15 +24,15 @@ public class UserModel implements UserDetails{
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID userId;
     private String username;
-    private String password;
     private String email;
+    private String password;
     @Enumerated(EnumType.STRING)
     private Roles role;
 
-    public UserModel(String username, String password, String email, Roles role){
+    public UserModel(String username, String email, String password, Roles role){
         this.username = username;
-        this.password = password;
         this.email = email;
+        this.password = password;
         this.role = role;
     }
 

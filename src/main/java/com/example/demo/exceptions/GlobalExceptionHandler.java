@@ -1,0 +1,52 @@
+package com.example.demo.exceptions;
+
+import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+import java.time.Instant;
+import java.util.List;
+import java.util.UUID;
+import java.util.stream.Collectors;
+
+@RestControllerAdvice
+public class GlobalExceptionHandler {
+
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleNotFound(ResourceNotFoundException ex, HttpServletRequest request) {
+        return build(HttpStatus.NOT_FOUND, ex.getErrorCode(), ex.getMessage(), List.of(), request);
+    }
+
+    @ExceptionHandler(BusinessRuleException.class)
+    public ResponseEntity<ErrorResponse> handleBusinessRule(BusinessRuleException ex, HttpServletRequest request) {
+        return build(HttpStatus.CONFLICT, ex.getErrorCode(), ex.getMessage(), List.of(), request);
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ErrorResponse> handleValidation(MethodArgumentNotValidException ex, HttpServletRequest request) {
+        List<ErrorDetail> details = ex.getBindingResult().getFieldErrors().stream()
+                .map(fe -> new ErrorDetail(fe.getField(), fe.getDefaultMessage()))
+                .collect(Collectors.toList());
+
+        return build(HttpStatus.UNPROCESSABLE_ENTITY, "VALIDACAO_FALHOU",
+                "Um ou mais campos são inválidos.", details, request);
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ErrorResponse> handleGeneric(Exception ex, HttpServletRequest request) {
+        return build(HttpStatus.INTERNAL_SERVER_ERROR, "ERRO_INTERNO",
+                "Ocorreu um erro inesperado.", List.of(), request);
+    }
+
+    private ResponseEntity<ErrorResponse> build(HttpStatus status, String error, String message,
+                                                List<ErrorDetail> details, HttpServletRequest request) {
+        ErrorResponse body = new ErrorResponse(
+                error, message, details, Instant.now(),
+                request.getRequestURI(), UUID.randomUUID().toString()
+        );
+        return ResponseEntity.status(status).body(body);
+    }
+}

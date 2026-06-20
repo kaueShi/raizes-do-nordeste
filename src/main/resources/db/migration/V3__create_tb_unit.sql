@@ -1,0 +1,7 @@
+CREATE TABLE tb_unidade(
+    unidade_id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY ,
+    nome VARCHAR(255) NOT NULL,
+    cidade VARCHAR(100) NOT NULL,
+    uf CHAR(2) NOT NULL,
+    cozinha_completa BOOLEAN NOT NULL DEFAULT TRUE
+);
