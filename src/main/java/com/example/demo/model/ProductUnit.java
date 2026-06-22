@@ -7,7 +7,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.math.BigDecimal;
-import java.util.UUID;
 
 @Entity
 @Table(name = "tb_produto_unidade")
@@ -32,4 +31,8 @@ public class ProductUnit {
     private BigDecimal preco;
     private int quantidade;
     private boolean disponivel;
+
+    public boolean getDisponivel() {
+        return disponivel;
+    }
 }

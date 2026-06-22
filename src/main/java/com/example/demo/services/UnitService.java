@@ -2,7 +2,6 @@ package com.example.demo.services;
 
 import com.example.demo.model.Unit;
 import com.example.demo.repository.UnitRepository;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

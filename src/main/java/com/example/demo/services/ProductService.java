@@ -1,7 +1,6 @@
 package com.example.demo.services;
 
 import com.example.demo.model.Product;
-import com.example.demo.model.ProductUnit;
 import com.example.demo.repository.ProductRepository;
 import com.example.demo.repository.ProductUnitRepository;
 import org.springframework.stereotype.Service;
@@ -50,8 +49,4 @@ public class ProductService {
         productRepository.delete(product);
     }
 
-
-    public ProductUnit saveProductUnit(ProductUnit productUnit) {
-        return productUnitRepository.save(productUnit);
-    }
 }

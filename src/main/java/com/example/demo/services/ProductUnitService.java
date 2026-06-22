@@ -1,10 +1,9 @@
 package com.example.demo.services;
 
+import com.example.demo.exceptions.ResourceNotFoundException;
 import com.example.demo.model.ProductUnit;
 import com.example.demo.repository.ProductUnitRepository;
 import org.springframework.stereotype.Service;
-
-import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -22,34 +21,27 @@ public class ProductUnitService {
         return productUnitRepository.existsByProduct_ProdutoIdAndUnit_UnidadeId(produtoId, unidadeId);
     }
 
-    public boolean findByUnidadeId(Long unidadeId) {
-        return productUnitRepository.findByUnidadeId(unidadeId);
-    }
-
     public ProductUnit saveProductUnit(ProductUnit productUnit) {
-        if(productUnitRepository.existsById(productUnit.getProdutoUnidadeId())){
-            throw new RuntimeException("Product already exists");
-        }
         return productUnitRepository.save(productUnit);
     }
-    public void  delete(ProductUnit productUnit){
-        productUnitRepository.delete(productUnit);
-
-    }
-/*
-    public boolean findByProdutoId(Long produtoId) {
-        return productUnitRepository.findByProdutoId(produtoId);
-    }*/
 
     public Optional<ProductUnit> findById(Long id) {
         return productUnitRepository.findById(id);
     }
 
-    public boolean findByProductAndUnit(Long aLong, Long unidadeId) {
+    public List<ProductUnit> findDisponiveisPorUnidade(Long unidadeId) {
         return productUnitRepository.findByUnit_UnidadeIdAndDisponivelTrue(unidadeId);
     }
 
-    public List<ProductUnit> getAllProducts() {
-        return productUnitRepository.findAll();
+
+    public ProductUnit buscarVinculoValido(Long unidadeId, Long produtoUnidadeId) {
+        ProductUnit productUnit = productUnitRepository.findById(produtoUnidadeId)
+                .orElseThrow(() -> new ResourceNotFoundException("VINCULO_NAO_ENCONTRADO", "Vínculo não encontrado: " + produtoUnidadeId));
+
+        if (!productUnit.getUnit().getUnidadeId().equals(unidadeId)) {
+            throw new ResourceNotFoundException("VINCULO_NAO_ENCONTRADO", "Este vínculo não pertence à unidade informada.");
+        }
+        return productUnit;
     }
+
 }

@@ -25,7 +25,7 @@ public class ProductController {
 
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<?> create(@RequestBody @Valid ProductDto data) {
+    public ResponseEntity<?> create(@RequestBody @Valid ProductCatalogResponseDto data) {
         if(productService.existsByNome(data.nome())){
             return ResponseEntity.status(HttpStatus.CONFLICT).body("Conflict: Product already exists!");
         }
@@ -41,12 +41,12 @@ public class ProductController {
 
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<?> update(@PathVariable Long id, @RequestBody @Valid ProductDto data) {
+    public ResponseEntity<?> atualizar(@PathVariable Long id, @RequestBody @Valid ProductCatalogResponseDto data) {
             Optional<Product> productOptional = productService.findById(id);
             if (productOptional.isEmpty()) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Product not found.");
             }
-            var product = new Product();
+            Product product = productOptional.get();
             product.setNome(data.nome());
             product.setDescricao(data.descricao());
             return ResponseEntity.status(HttpStatus.OK).body(productService.saveProduct(product));

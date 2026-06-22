@@ -66,12 +66,7 @@ public class ProductUnitController {
     @PreAuthorize("hasAnyRole('ADMIN', 'FUNCIONARIO')")
     public ResponseEntity<?> atualizar(@PathVariable Long unidadeId, @PathVariable Long produtoUnidadeId,
                                        @RequestBody @Valid ProductUnitDto data) {
-        ProductUnit productUnit = productUnitService.findById(produtoUnidadeId)
-                .orElseThrow(() -> new ResourceNotFoundException("PRODUTO_NAO_ENCONTRADO", "Produto não encontrada na unidade: " + produtoUnidadeId));
-
-        if (!productUnit.getUnit().getUnidadeId().equals(unidadeId)) {
-            throw new BusinessRuleException("VINCULO_INEXISTENTE", "Este produto não está vinculado a esta unidade.");
-        }
+        ProductUnit productUnit = productUnitService.buscarVinculoValido(unidadeId, produtoUnidadeId);
         productUnit.setPreco(data.preco());
         productUnit.setQuantidade(data.quantidade());
         productUnit.setDisponivel(data.disponivel());
@@ -84,13 +79,10 @@ public class ProductUnitController {
 
     @GetMapping
     public ResponseEntity<List<CardapioResponseDto>> cardapio(@PathVariable Long unidadeId) {
-        if(!productUnitService.findByUnidadeId(unidadeId)){
-            throw new BusinessRuleException("VINCULO_INEXISTENTE", "Este produto não está vinculado a esta unidade.");
-        }
         // findByUnit_UnidadeIdAndDisponivelTrue(unidadeId)
         // mapear para DTO de resposta (nome, descricao, preco, quantidade, disponivel)
         // devolver 200 OK
-        var cardapio = productUnitService.getAllProducts().stream()
+        var cardapio = productUnitService.findDisponiveisPorUnidade(unidadeId).stream()
                 .map(CardapioResponseDto::new)
                 .toList();
         return ResponseEntity.ok(cardapio);
@@ -98,38 +90,22 @@ public class ProductUnitController {
 
     @PatchMapping("/{produtoUnidadeId}")
     @PreAuthorize("hasAnyRole('ADMIN', 'FUNCIONARIO')")
-    public ResponseEntity<?> desativar(@PathVariable Long unidadeId, @PathVariable Long produtoUnidadeId,
-                                       @RequestBody @Valid ProductUnitDto data) {
-        ProductUnit productUnit = productUnitService.findById(produtoUnidadeId)
-            .orElseThrow(() -> new ResourceNotFoundException("PRODUTO_NAO_ENCONTRADO", "Produto não encontrada na unidade: " + produtoUnidadeId));
-
-        if (!productUnit.getUnit().getUnidadeId().equals(unidadeId)) {
-            throw new BusinessRuleException("VINCULO_INEXISTENTE", "Este produto não está vinculado a esta unidade.");
-        }
-        productUnit.setDisponivel(data.disponivel());
+    public ResponseEntity<?> desativar(@PathVariable Long unidadeId, @PathVariable Long produtoUnidadeId) {
+        ProductUnit productUnit = productUnitService.buscarVinculoValido(unidadeId, produtoUnidadeId);
+        productUnit.setDisponivel(false);
         return ResponseEntity.status(HttpStatus.OK).body(productUnitService.saveProductUnit(productUnit));
-
-        /*
-        *     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<?> delete(@PathVariable Long id) {
-        Optional<Product> productOptional = productService.findById(id);
-        if (!productOptional.isPresent()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Product not found.");
-        }
-        productService.delete(productOptional.get());
-        return ResponseEntity.status(HttpStatus.OK).body("Product deleted successfully.");
-    }*/
     }
 
-
+        @PatchMapping("/{produtoUnidadeId}/reativar")
+        @PreAuthorize("hasAnyRole('ADMIN', 'FUNCIONARIO')")
+        public ResponseEntity<?> reativar(@PathVariable Long unidadeId, @PathVariable Long produtoUnidadeId) {
+            ProductUnit productUnit = productUnitService.buscarVinculoValido(unidadeId, produtoUnidadeId);
+            productUnit.setDisponivel(true);
+            var saved = productUnitService.saveProductUnit(productUnit);
+            return ResponseEntity.ok(new ProductResponseDto(saved));
+        }
 
 }
-/*    public ResponseEntity<List<ProductCatalogResponseDto>> list() {
-        var produtos = productService.getAllProducts().stream()
-                .map(ProductCatalogResponseDto::new)
-                .toList();
-        return ResponseEntity.ok(produtos);*/
 
 
 
