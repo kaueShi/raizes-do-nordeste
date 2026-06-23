@@ -1,6 +1,6 @@
 package com.example.demo.services;
 
-import com.example.demo.dtos.PagamentoDto;
+import com.example.demo.dtos.pagamento.PagamentoDto;
 import com.example.demo.enums.StatusPagamento;
 import com.example.demo.enums.StatusPedido;
 import com.example.demo.exceptions.BusinessRuleException;

@@ -1,8 +1,8 @@
 package com.example.demo.controller;
 
-import com.example.demo.dtos.CardapioResponseDto;
-import com.example.demo.dtos.ProdutoResponseDto;
-import com.example.demo.dtos.ProdutoUnidadeDto;
+import com.example.demo.dtos.produto.CardapioResponseDto;
+import com.example.demo.dtos.produto.ProdutoResponseDto;
+import com.example.demo.dtos.produto.ProdutoUnidadeDto;
 import com.example.demo.exceptions.BusinessRuleException;
 import com.example.demo.exceptions.ResourceNotFoundException;
 import com.example.demo.model.Produto;

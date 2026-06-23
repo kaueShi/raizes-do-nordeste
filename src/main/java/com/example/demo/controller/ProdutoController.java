@@ -1,6 +1,7 @@
 package com.example.demo.controller;
 
-import com.example.demo.dtos.ProdutoCatalogoResponseDto;
+import com.example.demo.dtos.produto.ProdutoCatalogoResponseDto;
+import com.example.demo.exceptions.ResourceNotFoundException;
 import com.example.demo.model.Produto;
 import com.example.demo.services.ProdutoService;
 import jakarta.validation.Valid;
@@ -26,12 +27,12 @@ public class ProdutoController {
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> create(@RequestBody @Valid ProdutoCatalogoResponseDto data) {
         if(produtoService.existsByNome(data.nome())){
-            return ResponseEntity.status(HttpStatus.CONFLICT).body("Conflict: Produto already exists!");
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("Conflict: Produto já existe!");
         }
-        var product = new Produto();
-        product.setNome(data.nome());
-        product.setDescricao(data.descricao());
-        return ResponseEntity.status(HttpStatus.CREATED).body(produtoService.saveProduct(product));
+        var produto = new Produto();
+        produto.setNome(data.nome());
+        produto.setDescricao(data.descricao());
+        return ResponseEntity.status(HttpStatus.CREATED).body(new ProdutoCatalogoResponseDto(produto));
 
         // checar duplicidade (existsByNome) -> 409 se já existir
         // mapear DTO -> Produto, salvar
@@ -41,14 +42,15 @@ public class ProdutoController {
     @PutMapping("/produtos/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> atualizar(@PathVariable Long id, @RequestBody @Valid ProdutoCatalogoResponseDto data) {
-            Optional<Produto> productOptional = produtoService.findById(id);
-            if (productOptional.isEmpty()) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Produto not found.");
+            Optional<Produto> produtoOptional = produtoService.findById(id);
+            if (produtoOptional.isEmpty()) {
+                throw new ResourceNotFoundException("PRODUTO_NAO_ENCONTRADO", "Produto não encontrado");
             }
-            Produto produto = productOptional.get();
+
+            Produto produto = produtoOptional.get();
             produto.setNome(data.nome());
             produto.setDescricao(data.descricao());
-            return ResponseEntity.status(HttpStatus.OK).body(produtoService.saveProduct(produto));
+            return ResponseEntity.status(HttpStatus.OK).body(new ProdutoCatalogoResponseDto(produto));
         }
 
     @GetMapping
@@ -62,13 +64,11 @@ public class ProdutoController {
     @DeleteMapping("/produtos/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> delete(@PathVariable Long id) {
-        Optional<Produto> productOptional = produtoService.findById(id);
-        if (!productOptional.isPresent()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Produto not found.");
+        Optional<Produto> produtoOptional = produtoService.findById(id);
+        if (!produtoOptional.isPresent()) {
+            throw new ResourceNotFoundException("PRODUTO_NAO_ENCONTRADO", "Produto não encontrado");
         }
-        produtoService.delete(productOptional.get());
-        return ResponseEntity.status(HttpStatus.OK).body("Produto deleted successfully.");
+        produtoService.delete(produtoOptional.get());
+        return ResponseEntity.noContent().build();
     }
-
-
 }

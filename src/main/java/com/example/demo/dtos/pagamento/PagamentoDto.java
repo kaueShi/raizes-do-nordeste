@@ -1,4 +1,4 @@
-package com.example.demo.dtos;
+package com.example.demo.dtos.pagamento;
 
 import com.example.demo.enums.FormaPagamento;
 import jakarta.validation.constraints.NotNull;

@@ -1,9 +1,10 @@
 package com.example.demo.controller;
 
 import com.example.demo.config.security.TokenService;
-import com.example.demo.dtos.AuthenticationDto;
-import com.example.demo.dtos.LoginResponseDto;
-import com.example.demo.dtos.RegisterDto;
+import com.example.demo.dtos.auth.AuthenticationDto;
+import com.example.demo.dtos.auth.LoginResponseDto;
+import com.example.demo.dtos.auth.RegisterDto;
+import com.example.demo.dtos.auth.UsuarioResponseDto;
 import com.example.demo.enums.Roles;
 import com.example.demo.model.Usuario;
 import com.example.demo.repository.UsuarioRepository;
@@ -44,7 +45,7 @@ public class AuthenticationController {
 
 //-- Método utilizado apenas para incluit um usuário ADMIN no banco de dados
     @PostMapping("/register/admin")
-    public ResponseEntity<Void> registerAdmin(@RequestBody @Valid RegisterDto data) {
+    public ResponseEntity registerAdmin(@RequestBody @Valid RegisterDto data) {
         if(this.repository.findByEmail(data.email()) != null)
             return ResponseEntity.badRequest().build();
 
@@ -53,7 +54,7 @@ public class AuthenticationController {
         this.repository.save(novoAdmin);
 
         System.out.println(new BCryptPasswordEncoder().encode(data.senha()));
-        return ResponseEntity.status(HttpStatus.CREATED).build();
+        return ResponseEntity.status(HttpStatus.CREATED).body(new UsuarioResponseDto(novoAdmin));
     }
 // */
 
@@ -62,16 +63,16 @@ public class AuthenticationController {
         if(this.repository.findByEmail(data.email()) != null) return ResponseEntity.badRequest().build();
 
         String encryptedPassword = new BCryptPasswordEncoder().encode(data.senha());
-        Usuario newUsuario = new Usuario(data.nome(), data.email(), encryptedPassword, Roles.ROLE_CLIENTE);
+        Usuario novoUsuario = new Usuario(data.nome(), data.email(), encryptedPassword, Roles.ROLE_CLIENTE);
 
-        this.repository.save(newUsuario);
+        this.repository.save(novoUsuario);
 
-        return ResponseEntity.ok().build();
+        return ResponseEntity.status(HttpStatus.CREATED).body(new UsuarioResponseDto(novoUsuario));
     }
 
     @PostMapping("/register/funcionario")
     @PreAuthorize("hasRole('ADMIN')") // APENAS usuários com token de ADMIN podem acessar
-    public ResponseEntity<Void> registerEmployee(@RequestBody @Valid RegisterDto data) {
+    public ResponseEntity registerEmployee(@RequestBody @Valid RegisterDto data) {
 
         // Regra de segurança: mesmo o Admin não pode criar outro Admin por aqui, só Funcionários (opcional)
         if (data.role() == Roles.ROLE_ADMIN) {
@@ -79,11 +80,11 @@ public class AuthenticationController {
         }
 
         String encryptedPassword = new BCryptPasswordEncoder().encode(data.senha());
-        Usuario newUsuario = new Usuario(data.nome(), data.email(), encryptedPassword, Roles.ROLE_FUNCIONARIO);
+        Usuario novoUsuario = new Usuario(data.nome(), data.email(), encryptedPassword, Roles.ROLE_FUNCIONARIO);
 
-        this.repository.save(newUsuario);
+        this.repository.save(novoUsuario);
 
-        return ResponseEntity.status(HttpStatus.CREATED).build();
+        return ResponseEntity.status(HttpStatus.CREATED).body(new UsuarioResponseDto(novoUsuario));
     }
 
 }

@@ -1,7 +1,7 @@
 package com.example.demo.controller;
 
-import com.example.demo.dtos.PagamentoDto;
-import com.example.demo.dtos.PagamentoResponseDto;
+import com.example.demo.dtos.pagamento.PagamentoDto;
+import com.example.demo.dtos.pagamento.PagamentoResponseDto;
 import com.example.demo.model.Pagamento;
 import com.example.demo.model.Usuario;
 import com.example.demo.services.PagamentoService;

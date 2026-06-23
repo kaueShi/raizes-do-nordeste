@@ -1,4 +1,4 @@
-package com.example.demo.dtos;
+package com.example.demo.dtos.produto;
 
 import jakarta.validation.constraints.NotBlank;
 

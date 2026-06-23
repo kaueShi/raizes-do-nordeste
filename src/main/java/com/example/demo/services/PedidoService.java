@@ -1,7 +1,7 @@
 package com.example.demo.services;
 
-import com.example.demo.dtos.ItemPedidoDto;
-import com.example.demo.dtos.PedidoDto;
+import com.example.demo.dtos.pedido.ItemPedidoDto;
+import com.example.demo.dtos.pedido.PedidoDto;
 import com.example.demo.enums.CanalPedido;
 import com.example.demo.enums.StatusPedido;
 import com.example.demo.exceptions.BusinessRuleException;

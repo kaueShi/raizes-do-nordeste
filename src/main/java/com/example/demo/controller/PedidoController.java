@@ -1,8 +1,8 @@
 package com.example.demo.controller;
 
-import com.example.demo.dtos.PedidoDto;
-import com.example.demo.dtos.PedidoResponseDto;
-import com.example.demo.dtos.StatusUpdateDto;
+import com.example.demo.dtos.pedido.PedidoDto;
+import com.example.demo.dtos.pedido.PedidoResponseDto;
+import com.example.demo.dtos.pedido.StatusUpdateDto;
 import com.example.demo.enums.CanalPedido;
 import com.example.demo.model.Pedido;
 import com.example.demo.model.Usuario;

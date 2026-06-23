@@ -1,4 +1,4 @@
-package com.example.demo.dtos;
+package com.example.demo.dtos.auth;
 
 import com.example.demo.enums.Roles;
 
