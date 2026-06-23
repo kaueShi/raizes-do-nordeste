@@ -30,17 +30,34 @@ public class AuthenticationController {
     @Autowired
     private TokenService tokenService;
 
-    @PostMapping("/auth/login")
+
+    @PostMapping("/login")
     public ResponseEntity email(@RequestBody @Valid AuthenticationDto data){
         var emailPassword = new UsernamePasswordAuthenticationToken(data.email(), data.password());
         var auth = this.authenticationManager.authenticate(emailPassword);
 
         var token = tokenService.generateToken((Usuario) auth.getPrincipal());
-
         return ResponseEntity.ok(new LoginResponseDto(token));
     }
 
-    @PostMapping("/auth/register/cliente")
+
+
+//-- Método utilizado apenas para incluit um usuário ADMIN no banco de dados
+    @PostMapping("/register/admin")
+    public ResponseEntity<Void> registerAdmin(@RequestBody @Valid RegisterDto data) {
+        if(this.repository.findByEmail(data.email()) != null)
+            return ResponseEntity.badRequest().build();
+
+        String encryptedPassword = new BCryptPasswordEncoder().encode(data.senha());
+        Usuario novoAdmin = new Usuario(data.nome(), data.email(), encryptedPassword, Roles.ROLE_ADMIN);
+        this.repository.save(novoAdmin);
+
+        System.out.println(new BCryptPasswordEncoder().encode(data.senha()));
+        return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+// */
+
+    @PostMapping("/register/cliente")
     public ResponseEntity register(@RequestBody @Valid RegisterDto data){
         if(this.repository.findByEmail(data.email()) != null) return ResponseEntity.badRequest().build();
 
@@ -52,7 +69,7 @@ public class AuthenticationController {
         return ResponseEntity.ok().build();
     }
 
-    @PostMapping("/auth/register/funcionario")
+    @PostMapping("/register/funcionario")
     @PreAuthorize("hasRole('ADMIN')") // APENAS usuários com token de ADMIN podem acessar
     public ResponseEntity<Void> registerEmployee(@RequestBody @Valid RegisterDto data) {
 

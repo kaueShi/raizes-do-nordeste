@@ -10,8 +10,6 @@ CREATE TABLE tb_usuario
     senha   VARCHAR(255) NOT NULL,
     email      VARCHAR(255) NOT NULL,
     role       VARCHAR(50)  NOT NULL,
-    esta_ativo  BOOLEAN      NOT NULL DEFAULT TRUE,
-    criado_em TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT uc_tb_usuario_email UNIQUE (email),
     CONSTRAINT uc_tb_usuario_nome UNIQUE (nome),

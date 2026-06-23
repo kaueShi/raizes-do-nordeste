@@ -7,6 +7,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -26,8 +27,11 @@ public class SecurityFilter extends OncePerRequestFilter {
         if(token != null){
             var email = tokenService.validateToken(token);
             if(!email.isEmpty()){
-                Usuario user = (Usuario) usuarioRepository.findByEmail(email);
-                if (user == null) { filterChain.doFilter(request, response); return; }
+                Usuario usuario = (Usuario) usuarioRepository.findByEmail(email);
+                if (usuario == null) { filterChain.doFilter(request, response); return; }
+
+                var authentication = new UsernamePasswordAuthenticationToken(usuario, null, usuario.getAuthorities());
+                org.springframework.security.core.context.SecurityContextHolder.getContext().setAuthentication(authentication);
             }
         }
 

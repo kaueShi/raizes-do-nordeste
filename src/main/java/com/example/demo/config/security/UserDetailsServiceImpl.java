@@ -16,15 +16,15 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     }
 
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        // Altere aqui para buscar pelo email, já que o Spring passa o identificador (email) como nome
-        UserDetails user = usuarioRepository.findByEmail(username);
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+        // Altere aqui para buscar pelo email, já que o Spring passa o identificador (email) como email
+        UserDetails usuario = usuarioRepository.findByEmail(email);
 
-        if (user == null) {
-            throw new UsernameNotFoundException("User Not Found with email: " + username);
+        if (usuario == null) {
+            throw new UsernameNotFoundException("User Not Found with email: " + email);
         }
 
-        return user;
+        return usuario;
     }
 }
 

@@ -46,12 +46,15 @@ public class Usuario implements UserDetails{
         else return List.of(new SimpleGrantedAuthority("ROLE_FUNCIONARIO"));
     }
 
+
+    @Override
     public String getPassword() {
         return this.senha;
     }
 
+    @Override
     public String getUsername() {
-        return this.nome;
+        return this.email;
     }
 
     @Override

@@ -31,6 +31,7 @@ public class SecurityConfig {
                         //Auth - público
                         .requestMatchers(HttpMethod.POST, "/auth/login").permitAll()
                         .requestMatchers(HttpMethod.POST, "/auth/register/cliente").permitAll()
+                        //.requestMatchers(HttpMethod.POST, "/auth/register/admin").permitAll() -> Método apenas para inserir admin no BD
 
                         //Swagger - público
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
