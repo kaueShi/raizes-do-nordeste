@@ -27,9 +27,18 @@ public class SecurityConfig {
                 .csrf(crsf -> crsf.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorize -> authorize
+
+                        //Auth - público
                         .requestMatchers(HttpMethod.POST, "/auth/login").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/auth/register/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/auth/register/cliente").permitAll()
+
+                        //Swagger - público
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
+
+                        //Cardápio público (cliente vê antes de fazer login)
+                        .requestMatchers(HttpMethod.GET, "unidades/*/produtos").permitAll()
+
+                        //Tudo mais exige autenticação (roles específicas via @PreAuthorize)
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class)

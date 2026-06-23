@@ -6,10 +6,9 @@ import com.example.demo.enums.StatusPedido;
 import com.example.demo.exceptions.BusinessRuleException;
 import com.example.demo.model.Pagamento;
 import com.example.demo.model.Pedido;
-import com.example.demo.model.UserModel;
+import com.example.demo.model.Usuario;
 import com.example.demo.repository.PagamentoRepository;
 import jakarta.transaction.Transactional;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;
@@ -26,13 +25,11 @@ public class PagamentoService {
     }
 
     @Transactional
-    public Pagamento processarPagamento(Long pedidoId, UserModel usuarioLogado, PagamentoDto data) {
+    public Pagamento processarPagamento(Long pedidoId, Usuario usuarioLogado, PagamentoDto data) {
         Pedido pedido = pedidoService.buscarPorId(pedidoId, usuarioLogado); // reaproveita a checagem de dono que já existe
         if(pedido.getStatus() != StatusPedido.AGUARDANDO_PAGAMENTO){
             throw new BusinessRuleException("PAGAMENTO_JA_PROCESSADO", "Pagamento já processado");
         }
-        // TODO: validar pedido.getStatus() == StatusPedido.AGUARDANDO_PAGAMENTO
-        //       -> se não for, throw BusinessRuleException("PAGAMENTO_JA_PROCESSADO", ...) (409)
 
         StatusPagamento statusPagamento = Boolean.TRUE.equals(data.simularFalha())
                 ? StatusPagamento.RECUSADO
@@ -51,8 +48,6 @@ public class PagamentoService {
             pedidoService.recusarPagamento(pedido);
 
         }
-        // TODO: if (statusPagamento == StatusPagamento.APROVADO) pedidoService.confirmarPagamento(pedido);
-        //       else pedidoService.recusarPagamento(pedido);
 
         return pagamentoRepository.save(pagamento);
     }

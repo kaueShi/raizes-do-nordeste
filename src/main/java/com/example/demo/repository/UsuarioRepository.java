@@ -1,15 +1,15 @@
 package com.example.demo.repository;
 
-import com.example.demo.model.UserModel;
+import com.example.demo.model.Usuario;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Optional;
 import java.util.UUID;
 
-public interface UserRepository extends JpaRepository<UserModel, UUID> {
+public interface UsuarioRepository extends JpaRepository<Usuario, UUID> {
 
-    Optional<UserModel> findByUsername(String username);
+    Optional<Usuario> findByNome(String nome);
 
     UserDetails findByEmail(String email);
 

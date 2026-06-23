@@ -26,10 +26,10 @@ public class ItemPedido {
 
     @ManyToOne
     @JoinColumn(name = "produto_unidade_id", nullable = false)
-    private ProductUnit productUnit;
+    private ProdutoUnidade produtoUnidade;
 
     private int quantidade;
 
-    private BigDecimal precoUnit;
+    private BigDecimal precoUnitario;
 
 }

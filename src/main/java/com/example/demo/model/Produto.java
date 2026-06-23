@@ -8,26 +8,22 @@ import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 @Entity
-@Table(name = "tb_unidade")
+@Table(name = "tb_produtos")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Unit {
+public class Produto {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long unidadeId;
+    private Long produtoId;
     private String nome;
-    private String cidade;
-    private String uf;
-    private boolean cozinhaCompleta;
+    private String descricao;
 
-
-    @OneToMany(mappedBy = "unit")
-    private List<ProductUnit> produtos = new ArrayList<>();
+    @OneToMany(mappedBy = "produto")
+    private List<ProdutoUnidade> unidades = new ArrayList<>();
 
 }

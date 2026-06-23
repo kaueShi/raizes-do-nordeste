@@ -14,25 +14,25 @@ import java.util.List;
 import java.util.UUID;
 
 @Entity
-@Table(name = "tb_user")
+@Table(name = "tb_usuario")
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserModel implements UserDetails{
+public class Usuario implements UserDetails{
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID userId;
-    private String username;
+    private UUID usuarioId;
+    private String nome;
     private String email;
-    private String password;
+    private String senha;
     @Enumerated(EnumType.STRING)
     private Roles role;
 
-    public UserModel(String username, String email, String password, Roles role){
-        this.username = username;
+    public Usuario(String nome, String email, String senha, Roles role){
+        this.nome = nome;
         this.email = email;
-        this.password = password;
+        this.senha = senha;
         this.role = role;
     }
 
@@ -46,14 +46,12 @@ public class UserModel implements UserDetails{
         else return List.of(new SimpleGrantedAuthority("ROLE_FUNCIONARIO"));
     }
 
-    @Override
     public String getPassword() {
-        return this.password;
+        return this.senha;
     }
 
-    @Override
     public String getUsername() {
-        return this.username;
+        return this.nome;
     }
 
     @Override

@@ -15,7 +15,7 @@ public record PedidoResponseDto(Long pedidoId, UUID clienteId, String clienteNom
 
     public PedidoResponseDto(Pedido pedido) {
         this(pedido.getPedidoId(),
-                pedido.getCliente().getUserId(),
+                pedido.getCliente().getUsuarioId(),
                 pedido.getCliente().getUsername(),
                 pedido.getUnidadePedido().getUnidadeId(),
                 pedido.getUnidadePedido().getNome(),

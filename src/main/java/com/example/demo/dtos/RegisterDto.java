@@ -2,5 +2,5 @@ package com.example.demo.dtos;
 
 import com.example.demo.enums.Roles;
 
-public record RegisterDto(String username, String email, String password, Roles role) {
+public record RegisterDto(String nome, String email, String senha, Roles role) {
 }

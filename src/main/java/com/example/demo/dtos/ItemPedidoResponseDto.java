@@ -6,9 +6,9 @@ import java.math.BigDecimal;
 
 public record ItemPedidoResponseDto(String nomeProduto, Integer quantidade, BigDecimal precoUnitario, BigDecimal subtotal) {
     public ItemPedidoResponseDto(ItemPedido item) {
-        this(item.getProductUnit().getProduct().getNome(),
+        this(item.getProdutoUnidade().getProduto().getNome(),
                 item.getQuantidade(),
-                item.getPrecoUnit(),
-                item.getPrecoUnit().multiply(BigDecimal.valueOf(item.getQuantidade())));
+                item.getPrecoUnitario(),
+                item.getPrecoUnitario().multiply(BigDecimal.valueOf(item.getQuantidade())));
     }
 }

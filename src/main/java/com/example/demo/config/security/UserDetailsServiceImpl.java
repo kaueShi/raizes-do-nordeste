@@ -1,8 +1,6 @@
 package com.example.demo.config.security;
 
-import com.example.demo.model.UserModel;
-import com.example.demo.repository.UserRepository;
-import org.springframework.security.core.userdetails.User;
+import com.example.demo.repository.UsuarioRepository;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -11,16 +9,16 @@ import org.springframework.stereotype.Service;
 @Service
 public class UserDetailsServiceImpl implements UserDetailsService {
 
-    final UserRepository userRepository;
+    final UsuarioRepository usuarioRepository;
 
-    public UserDetailsServiceImpl(UserRepository userRepository) {
-        this.userRepository = userRepository;
+    public UserDetailsServiceImpl(UsuarioRepository usuarioRepository) {
+        this.usuarioRepository = usuarioRepository;
     }
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        // Altere aqui para buscar pelo email, já que o Spring passa o identificador (email) como username
-        UserDetails user = userRepository.findByEmail(username);
+        // Altere aqui para buscar pelo email, já que o Spring passa o identificador (email) como nome
+        UserDetails user = usuarioRepository.findByEmail(username);
 
         if (user == null) {
             throw new UsernameNotFoundException("User Not Found with email: " + username);

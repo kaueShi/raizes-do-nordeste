@@ -1,12 +1,15 @@
+/*DROP TABLE IF EXISTS tb_pedido CASCADE;
+DROP TABLE IF EXISTS tb_item_pedido CASCADE;*/
+
 CREATE TABLE tb_pedido
 (
     pedido_id    BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    cliente_id   UUID NOT NULL REFERENCES tb_user(user_id),
+    cliente_id   UUID NOT NULL REFERENCES tb_usuario(usuario_id) ,
     unidade_id   BIGINT NOT NULL REFERENCES tb_unidade(unidade_id),
     canal_pedido VARCHAR(20) NOT NULL CHECK (canal_pedido IN ('APP','TOTEM','BALCAO','PICKUP','WEB')),
     status       VARCHAR(30) NOT NULL DEFAULT 'AGUARDANDO_PAGAMENTO',
     total        NUMERIC(10,2) NOT NULL,
-    created_at   TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+    data_pedido   TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE tb_item_pedido

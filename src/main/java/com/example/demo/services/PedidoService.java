@@ -8,8 +8,8 @@ import com.example.demo.exceptions.BusinessRuleException;
 import com.example.demo.exceptions.ResourceNotFoundException;
 import com.example.demo.model.*;
 import com.example.demo.repository.PedidoRepository;
-import com.example.demo.repository.ProductUnitRepository;
-import com.example.demo.repository.UnitRepository;
+import com.example.demo.repository.ProdutoUnidadeRepository;
+import com.example.demo.repository.UnidadeRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
@@ -21,23 +21,23 @@ import java.util.List;
 public class PedidoService {
 
     private final PedidoRepository pedidoRepository;
-    private final UnitRepository unitRepository;
-    private final ProductUnitRepository productUnitRepository;
+    private final UnidadeRepository unidadeRepository;
+    private final ProdutoUnidadeRepository produtoUnidadeRepository;
 
-    public PedidoService(PedidoRepository pedidoRepository, UnitRepository unitRepository, ProductUnitRepository productUnitRepository){
+    public PedidoService(PedidoRepository pedidoRepository, UnidadeRepository unidadeRepository, ProdutoUnidadeRepository produtoUnidadeRepository){
         this.pedidoRepository = pedidoRepository;
-        this.unitRepository = unitRepository;
-        this.productUnitRepository = productUnitRepository;
+        this.unidadeRepository = unidadeRepository;
+        this.produtoUnidadeRepository = produtoUnidadeRepository;
     }
 
     @Transactional
-    public Pedido criarPedido(UserModel cliente, PedidoDto data) {
-        Unit unit = unitRepository.findById(data.unidadeId())
+    public Pedido criarPedido(Usuario cliente, PedidoDto data) {
+        Unidade unidade = unidadeRepository.findById(data.unidadeId())
                 .orElseThrow(() -> new ResourceNotFoundException("UNIDADE_NAO_ENCONTRADA", "Unidade não encontrada" + data.unidadeId()));
 
         var pedido = new Pedido();
         pedido.setCliente(cliente);
-        pedido.setUnidadePedido(unit);
+        pedido.setUnidadePedido(unidade);
         pedido.setCanalPedido(data.canalPedido());
         pedido.setStatus(StatusPedido.AGUARDANDO_PAGAMENTO);
 
@@ -45,20 +45,20 @@ public class PedidoService {
         BigDecimal total = BigDecimal.ZERO;
 
         for (ItemPedidoDto itemDto : data.itens()) {
-            ProductUnit productUnit = productUnitRepository.findByProduct_ProdutoIdAndUnit_UnidadeId(itemDto.produtoId(), data.unidadeId())
+            ProdutoUnidade produtoUnidade = produtoUnidadeRepository.findByProduto_ProdutoIdAndUnidade_UnidadeId(itemDto.produtoId(), data.unidadeId())
                     .orElseThrow(() -> new ResourceNotFoundException("PRODUTO_NAO_ENCONTRADO", "Produto não encontrado" + data.itens()));
-            if (productUnit.getQuantidade() < itemDto.quantidade()) {
+            if (produtoUnidade.getQuantidade() < itemDto.quantidade()) {
                 throw new BusinessRuleException("ESTOQUE_INSUFICIENTE",
-                        "Estoque insuficiente para o produto " + itemDto.produtoId() + ". Disponível: " + productUnit.getQuantidade());
+                        "Estoque insuficiente para o produto " + itemDto.produtoId() + ". Disponível: " + produtoUnidade.getQuantidade());
             }
             var item = new ItemPedido();
             item.setPedido(pedido); // crucial: sem isso o FK pedido_id fica null no banco
-            item.setProductUnit(productUnit);
+            item.setProdutoUnidade(produtoUnidade);
             item.setQuantidade(itemDto.quantidade());
-            item.setPrecoUnit(productUnit.getPreco()); // captura o preço AGORA
+            item.setPrecoUnitario(produtoUnidade.getPreco()); // captura o preço AGORA
 
             itens.add(item);
-            total = total.add(item.getPrecoUnit().multiply(BigDecimal.valueOf(item.getQuantidade())));
+            total = total.add(item.getPrecoUnitario().multiply(BigDecimal.valueOf(item.getQuantidade())));
         }
 
         pedido.setItens(itens);
@@ -84,7 +84,7 @@ public class PedidoService {
         return pedidoRepository.findAll();
     }
 
-    public Pedido buscarPorId(Long id, UserModel usuarioLogado) {
+    public Pedido buscarPorId(Long id, Usuario usuarioLogado) {
         Pedido pedido = pedidoRepository.findById(id)
                 .orElseThrow(()-> new ResourceNotFoundException("PEDIDO_NAO_ENCONTRADO", "Pedido não encontrado: " + id));
         boolean ehAdminOuFuncionario = usuarioLogado.getAuthorities().stream()
@@ -92,7 +92,7 @@ public class PedidoService {
                         a.getAuthority().equals("ROLE_FUNCIONARIO"));
 
         // Se NÃO for admin/funcionario E NÃO for o dono do pedido -> Acesso Negado
-        if (!ehAdminOuFuncionario && !pedido.getCliente().getUserId().equals(usuarioLogado.getUserId())) {
+        if (!ehAdminOuFuncionario && !pedido.getCliente().getUsuarioId().equals(usuarioLogado.getUsuarioId())) {
             throw new BusinessRuleException("ACESSO_NEGADO", "Você não tem permissão para visualizar este pedido.");
         }
         return pedido;
@@ -101,9 +101,9 @@ public class PedidoService {
     @Transactional
     public void confirmaPagamento(Pedido pedido){
         for (ItemPedido item : pedido.getItens()){
-            ProductUnit pu = item.getProductUnit();
+            ProdutoUnidade pu = item.getProdutoUnidade();
             pu.setQuantidade(pu.getQuantidade() - item.getQuantidade());
-            productUnitRepository.save(pu);
+            produtoUnidadeRepository.save(pu);
         }
         pedido.setStatus(StatusPedido.EM_PREPARO);
         pedidoRepository.save(pedido);

@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="DataSourcePerFileMappings">
-    <file url="file://$PROJECT_DIR$/src/main/resources/db/migration/V2__create_tb_user.sql" value="b707d2b6-271d-44cb-ac25-3ad6e82618f1" />
+    <file url="file://$PROJECT_DIR$/src/main/resources/db/migration/V1__create_tb_produtos.sql" value="b707d2b6-271d-44cb-ac25-3ad6e82618f1" />
+    <file url="file://$PROJECT_DIR$/src/main/resources/db/migration/V2__create_tb_usuario.sql" value="b707d2b6-271d-44cb-ac25-3ad6e82618f1" />
+    <file url="file://$PROJECT_DIR$/src/main/resources/db/migration/V3__create_tb_unidade.sql" value="b707d2b6-271d-44cb-ac25-3ad6e82618f1" />
+    <file url="file://$PROJECT_DIR$/src/main/resources/db/migration/V4__create_tb_produto_unidade.sql" value="b707d2b6-271d-44cb-ac25-3ad6e82618f1" />
+    <file url="file://$PROJECT_DIR$/src/main/resources/db/migration/V5__create_tb_pedido.sql" value="b707d2b6-271d-44cb-ac25-3ad6e82618f1" />
+    <file url="file://$PROJECT_DIR$/src/main/resources/db/migration/V6__create_tb_pagamento.sql" value="b707d2b6-271d-44cb-ac25-3ad6e82618f1" />
   </component>
 </project>

@@ -1,3 +1,5 @@
+/*DROP TABLE IF EXISTS tb_pagamento CASCADE;*/
+
 CREATE TABLE tb_pagamento
 (
     pagamento_id    BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,

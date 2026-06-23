@@ -5,8 +5,8 @@ import com.example.demo.dtos.AuthenticationDto;
 import com.example.demo.dtos.LoginResponseDto;
 import com.example.demo.dtos.RegisterDto;
 import com.example.demo.enums.Roles;
-import com.example.demo.model.UserModel;
-import com.example.demo.repository.UserRepository;
+import com.example.demo.model.Usuario;
+import com.example.demo.repository.UsuarioRepository;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -26,33 +26,33 @@ public class AuthenticationController {
     @Autowired
     private AuthenticationManager authenticationManager;
     @Autowired
-    private UserRepository repository;
+    private UsuarioRepository repository;
     @Autowired
     private TokenService tokenService;
 
-    @PostMapping("/login")
+    @PostMapping("/auth/login")
     public ResponseEntity email(@RequestBody @Valid AuthenticationDto data){
         var emailPassword = new UsernamePasswordAuthenticationToken(data.email(), data.password());
         var auth = this.authenticationManager.authenticate(emailPassword);
 
-        var token = tokenService.generateToken((UserModel) auth.getPrincipal());
+        var token = tokenService.generateToken((Usuario) auth.getPrincipal());
 
         return ResponseEntity.ok(new LoginResponseDto(token));
     }
 
-    @PostMapping("/register/cliente")
+    @PostMapping("/auth/register/cliente")
     public ResponseEntity register(@RequestBody @Valid RegisterDto data){
         if(this.repository.findByEmail(data.email()) != null) return ResponseEntity.badRequest().build();
 
-        String encryptedPassword = new BCryptPasswordEncoder().encode(data.password());
-        UserModel newUserModel = new UserModel(data.username(), data.email(), encryptedPassword, Roles.ROLE_CLIENTE);
+        String encryptedPassword = new BCryptPasswordEncoder().encode(data.senha());
+        Usuario newUsuario = new Usuario(data.nome(), data.email(), encryptedPassword, Roles.ROLE_CLIENTE);
 
-        this.repository.save(newUserModel);
+        this.repository.save(newUsuario);
 
         return ResponseEntity.ok().build();
     }
 
-    @PostMapping("/register/employee")
+    @PostMapping("/auth/register/funcionario")
     @PreAuthorize("hasRole('ADMIN')") // APENAS usuários com token de ADMIN podem acessar
     public ResponseEntity<Void> registerEmployee(@RequestBody @Valid RegisterDto data) {
 
@@ -61,10 +61,10 @@ public class AuthenticationController {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
 
-        String encryptedPassword = new BCryptPasswordEncoder().encode(data.password());
-        UserModel newUserModel = new UserModel(data.username(), data.email(), encryptedPassword, Roles.ROLE_FUNCIONARIO);
+        String encryptedPassword = new BCryptPasswordEncoder().encode(data.senha());
+        Usuario newUsuario = new Usuario(data.nome(), data.email(), encryptedPassword, Roles.ROLE_FUNCIONARIO);
 
-        this.repository.save(newUserModel);
+        this.repository.save(newUsuario);
 
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }

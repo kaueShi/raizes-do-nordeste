@@ -14,7 +14,7 @@ import java.math.BigDecimal;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ProductUnit {
+public class ProdutoUnidade {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -22,11 +22,11 @@ public class ProductUnit {
 
     @ManyToOne
     @JoinColumn(name = "produto_id", nullable = false)
-    private Product product;
+    private Produto produto;
 
     @ManyToOne
     @JoinColumn(name = "unidade_id", nullable = false)
-    private Unit unit;
+    private Unidade unidade;
 
     private BigDecimal preco;
     private int quantidade;

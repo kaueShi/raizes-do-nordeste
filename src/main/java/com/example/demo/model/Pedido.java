@@ -28,22 +28,22 @@ public class Pedido {
 
     @ManyToOne
     @JoinColumn(name = "cliente_id", nullable = false)
-    private UserModel cliente;
+    private Usuario cliente;
 
     @ManyToOne
     @JoinColumn(name = "unidade_id", nullable = false)
-    private Unit unidadePedido;
+    private Unidade unidadePedido;
 
     @Enumerated(EnumType.STRING)
     private CanalPedido canalPedido;
-
-    @CreationTimestamp
-    private LocalDateTime dataPedido;
 
     @Enumerated(EnumType.STRING)
     private StatusPedido status;
 
     private BigDecimal total;
+
+    @CreationTimestamp
+    private LocalDateTime dataPedido;
 
     @OneToMany(mappedBy = "pedido", cascade = CascadeType.ALL)
     private List<ItemPedido> itens = new ArrayList<>();

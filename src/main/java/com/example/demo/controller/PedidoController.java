@@ -5,14 +5,13 @@ import com.example.demo.dtos.PedidoResponseDto;
 import com.example.demo.dtos.StatusUpdateDto;
 import com.example.demo.enums.CanalPedido;
 import com.example.demo.model.Pedido;
-import com.example.demo.model.UserModel;
+import com.example.demo.model.Usuario;
 import com.example.demo.services.PedidoService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -27,7 +26,7 @@ public class PedidoController {
 
     @PostMapping
     @PreAuthorize("hasAnyRole('CLIENTE', 'FUNCIONARIO')")
-    public ResponseEntity<?> criar(@AuthenticationPrincipal UserModel usuarioLogado, @RequestBody @Valid PedidoDto data) {
+    public ResponseEntity<?> criar(@AuthenticationPrincipal Usuario usuarioLogado, @RequestBody @Valid PedidoDto data) {
         Pedido pedido = pedidoService.criarPedido(usuarioLogado, data);
         return ResponseEntity.status(HttpStatus.CREATED).body(new PedidoResponseDto(pedido));
     }
@@ -41,7 +40,7 @@ public class PedidoController {
 
     @GetMapping("/{id}")
     public ResponseEntity<?> buscar(@PathVariable Long id,
-                                    @AuthenticationPrincipal UserModel usuarioAutenticado) {
+                                    @AuthenticationPrincipal Usuario usuarioAutenticado) {
         Pedido pedido = pedidoService.buscarPorId(id, usuarioAutenticado);
         return ResponseEntity.ok(new PedidoResponseDto(pedido));
     }
