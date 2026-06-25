@@ -17,11 +17,15 @@ public class UnidadeService {
         this.unidadeRepository = unidadeRepository;
     }
 
-    public List<Unidade> getAllUnits() {
+    public List<Unidade> getAllUnidades() {
         return unidadeRepository.findAll();
     }
 
-    public Unidade saveProduct(Unidade unidade) {
+    public boolean existsByNome(String nome) {
+        return unidadeRepository.existsByNome(nome);
+    }
+
+    public Unidade saveUnidade(Unidade unidade) {
         return unidadeRepository.save(unidade);
     }
 

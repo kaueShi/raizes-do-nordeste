@@ -30,6 +30,12 @@ public class PedidoService {
         this.produtoUnidadeRepository = produtoUnidadeRepository;
     }
 
+    /**
+     * Cria um pedido validando disponilidade de estoque sem decrementá-lo.
+     * O estoque só é descontado após confirmação do pagamento via {@link #confirmaPagamento},
+     * O total é calculado internamente a partir dos preços atuais dos produtos,
+     * nunca confiando em valores enviados pelo cliente.
+     */
     @Transactional
     public Pedido criarPedido(Usuario cliente, PedidoDto data) {
         Unidade unidade = unidadeRepository.findById(data.unidadeId())
@@ -66,6 +72,38 @@ public class PedidoService {
 
         return pedidoRepository.save(pedido); // cascade salva os itens junto, ver nota abaixo
     }
+
+    /**
+     * Confirma o pagamento aprovado: decrementa estoque de cada item
+     * e avança o status do pedido para EM_PREPARO.
+     * Deve ser chamado exclusivamente pelo PagamentoService.
+     */
+    @Transactional
+    public void confirmaPagamento(Pedido pedido){
+        for (ItemPedido item : pedido.getItens()){
+            ProdutoUnidade pu = item.getProdutoUnidade();
+            pu.setQuantidade(pu.getQuantidade() - item.getQuantidade());
+            produtoUnidadeRepository.save(pu);
+        }
+        pedido.setStatus(StatusPedido.EM_PREPARO);
+        pedidoRepository.save(pedido);
+    }
+
+    /**
+     * Registra recusa do pagamento e atualiza status do pedido
+     * para PAGAMENTO_RECUSADO. Estoque não é afetado
+     */
+    @Transactional
+    public void recusarPagamento(Pedido pedido) {
+        pedido.setStatus(StatusPedido.PAGAMENTO_RECUSADO); // ou o nome corrigido, se você já ajustou o typo
+        pedidoRepository.save(pedido);
+    }
+
+    /**
+     * Atualiza o status do pedido respeitando a máquina de estado definida em StatusPedido
+     * Transição inválidas lançam BusinessRuleException
+     * Apenas ADMIN e FUNCIONARIO podem chamar este método
+     */
     public Pedido atualizarStatus(Long pedidoId, StatusPedido novoStatus) {
         Pedido pedido = pedidoRepository.findById(pedidoId)
                 .orElseThrow(() -> new ResourceNotFoundException("PEDIDO_NAO_ENCONTRADO", "Pedido não encontrado: " + pedidoId));
@@ -84,6 +122,11 @@ public class PedidoService {
         return pedidoRepository.findAll();
     }
 
+    /**
+     * Busca pedido por ID validando permissão de acesso:
+     * CLIENTE só acessa os próprios pedidos.
+     * ADMIN e FUNCIONARIO acessam qualquer pedido.
+     */
     public Pedido buscarPorId(Long id, Usuario usuarioLogado) {
         Pedido pedido = pedidoRepository.findById(id)
                 .orElseThrow(()-> new ResourceNotFoundException("PEDIDO_NAO_ENCONTRADO", "Pedido não encontrado: " + id));
@@ -96,21 +139,5 @@ public class PedidoService {
             throw new BusinessRuleException("ACESSO_NEGADO", "Você não tem permissão para visualizar este pedido.");
         }
         return pedido;
-    }
-
-    @Transactional
-    public void confirmaPagamento(Pedido pedido){
-        for (ItemPedido item : pedido.getItens()){
-            ProdutoUnidade pu = item.getProdutoUnidade();
-            pu.setQuantidade(pu.getQuantidade() - item.getQuantidade());
-            produtoUnidadeRepository.save(pu);
-        }
-        pedido.setStatus(StatusPedido.EM_PREPARO);
-        pedidoRepository.save(pedido);
-    }
-
-    public void recusarPagamento(Pedido pedido) {
-        pedido.setStatus(StatusPedido.PAGAMENTO_RECUSADO); // ou o nome corrigido, se você já ajustou o typo
-        pedidoRepository.save(pedido);
     }
 }

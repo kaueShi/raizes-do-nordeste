@@ -6,8 +6,12 @@ import com.example.demo.dtos.auth.LoginResponseDto;
 import com.example.demo.dtos.auth.RegisterDto;
 import com.example.demo.dtos.auth.UsuarioResponseDto;
 import com.example.demo.enums.Roles;
+import com.example.demo.exceptions.BusinessRuleException;
 import com.example.demo.model.Usuario;
 import com.example.demo.repository.UsuarioRepository;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -21,6 +25,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+@Tag(name = "Autenticação", description = "Login e cadastro de usuários")
 @RestController
 @RequestMapping("auth")
 public class AuthenticationController {
@@ -31,9 +36,12 @@ public class AuthenticationController {
     @Autowired
     private TokenService tokenService;
 
-
+    @Operation(summary = "Realiza login e retorna token JWT")
+    @ApiResponse(responseCode = "200", description = "Login realizado com sucesso")
+    @ApiResponse(responseCode = "401", description = "Credenciais inválidas")
+    @ApiResponse(responseCode = "422", description = "Campos inválidos")
     @PostMapping("/login")
-    public ResponseEntity email(@RequestBody @Valid AuthenticationDto data){
+    public ResponseEntity<LoginResponseDto> login(@RequestBody @Valid AuthenticationDto data){
         var emailPassword = new UsernamePasswordAuthenticationToken(data.email(), data.password());
         var auth = this.authenticationManager.authenticate(emailPassword);
 
@@ -43,11 +51,11 @@ public class AuthenticationController {
 
 
 
-//-- Método utilizado apenas para incluit um usuário ADMIN no banco de dados
+// -- Método utilizado apenas para incluit um usuário ADMIN no banco de dados
     @PostMapping("/register/admin")
-    public ResponseEntity registerAdmin(@RequestBody @Valid RegisterDto data) {
+    public ResponseEntity<UsuarioResponseDto> registerAdmin(@RequestBody @Valid RegisterDto data) {
         if(this.repository.findByEmail(data.email()) != null)
-            return ResponseEntity.badRequest().build();
+            throw new BusinessRuleException("EMAIL_JA_CADASTRADO", "Este e-mail já está em uso.");
 
         String encryptedPassword = new BCryptPasswordEncoder().encode(data.senha());
         Usuario novoAdmin = new Usuario(data.nome(), data.email(), encryptedPassword, Roles.ROLE_ADMIN);
@@ -56,11 +64,15 @@ public class AuthenticationController {
         System.out.println(new BCryptPasswordEncoder().encode(data.senha()));
         return ResponseEntity.status(HttpStatus.CREATED).body(new UsuarioResponseDto(novoAdmin));
     }
-// */
 
+
+    @Operation(summary = "Cadastra um novo cliente")
+    @ApiResponse(responseCode = "201", description = "Cliente cadastrado")
+    @ApiResponse(responseCode = "400", description = "E-mail já cadastrado")
     @PostMapping("/register/cliente")
-    public ResponseEntity register(@RequestBody @Valid RegisterDto data){
-        if(this.repository.findByEmail(data.email()) != null) return ResponseEntity.badRequest().build();
+    public ResponseEntity<UsuarioResponseDto> register(@RequestBody @Valid RegisterDto data){
+        if(this.repository.findByEmail(data.email()) != null)
+            throw new BusinessRuleException("EMAIL_JA_CADASTRADO", "Este e-mail já está em uso.");
 
         String encryptedPassword = new BCryptPasswordEncoder().encode(data.senha());
         Usuario novoUsuario = new Usuario(data.nome(), data.email(), encryptedPassword, Roles.ROLE_CLIENTE);
@@ -70,13 +82,16 @@ public class AuthenticationController {
         return ResponseEntity.status(HttpStatus.CREATED).body(new UsuarioResponseDto(novoUsuario));
     }
 
+    @Operation(summary = "Cadastra um funcionário - somente ADMIN")
+    @ApiResponse(responseCode = "201", description = "Funcionário cadastrado")
+    @ApiResponse(responseCode = "403", description = "Sem permissão")
     @PostMapping("/register/funcionario")
     @PreAuthorize("hasRole('ADMIN')") // APENAS usuários com token de ADMIN podem acessar
-    public ResponseEntity registerEmployee(@RequestBody @Valid RegisterDto data) {
+    public ResponseEntity<UsuarioResponseDto> registerEmployee(@RequestBody @Valid RegisterDto data) {
 
         // Regra de segurança: mesmo o Admin não pode criar outro Admin por aqui, só Funcionários (opcional)
         if (data.role() == Roles.ROLE_ADMIN) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+            throw new BusinessRuleException("OPERACAO_NAO_AUTORIZADA", "Operação não autorizada");
         }
 
         String encryptedPassword = new BCryptPasswordEncoder().encode(data.senha());
@@ -86,5 +101,4 @@ public class AuthenticationController {
 
         return ResponseEntity.status(HttpStatus.CREATED).body(new UsuarioResponseDto(novoUsuario));
     }
-
 }

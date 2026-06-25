@@ -7,5 +7,6 @@
     <file url="file://$PROJECT_DIR$/src/main/resources/db/migration/V4__create_tb_produto_unidade.sql" value="b707d2b6-271d-44cb-ac25-3ad6e82618f1" />
     <file url="file://$PROJECT_DIR$/src/main/resources/db/migration/V5__create_tb_pedido.sql" value="b707d2b6-271d-44cb-ac25-3ad6e82618f1" />
     <file url="file://$PROJECT_DIR$/src/main/resources/db/migration/V6__create_tb_pagamento.sql" value="b707d2b6-271d-44cb-ac25-3ad6e82618f1" />
+    <file url="file://$PROJECT_DIR$/src/main/resources/db/migration/V7__insert_dados_iniciais.sql" value="b707d2b6-271d-44cb-ac25-3ad6e82618f1" />
   </component>
 </project>

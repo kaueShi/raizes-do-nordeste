@@ -24,6 +24,12 @@ public class PagamentoService {
         this.pedidoService = pedidoService;
     }
 
+    /**
+     * Processa pagamento mocl sem integração com gateway real.
+     * O resultado (APROVADO/RECUSADO) é controlado pelo campo simularFalha do DTO.
+     * Um transacaoId UUID é gerado para simular o identificador que um gateway real devolveria
+     * Lança BusinessRuleException se o pedido não estiver em AGUARDANDO_PAGAMENTO.
+     */
     @Transactional
     public Pagamento processarPagamento(Long pedidoId, Usuario usuarioLogado, PagamentoDto data) {
         Pedido pedido = pedidoService.buscarPorId(pedidoId, usuarioLogado); // reaproveita a checagem de dono que já existe

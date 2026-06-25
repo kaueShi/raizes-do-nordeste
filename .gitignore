@@ -50,4 +50,5 @@ buildNumber.properties
 # === Configurações e Segredos ===
 .env
 .env.local
+*.env
 

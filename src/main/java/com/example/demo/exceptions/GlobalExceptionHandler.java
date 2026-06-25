@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import javax.naming.AuthenticationException;
+import org.springframework.security.access.AccessDeniedException;
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
@@ -21,10 +22,20 @@ public class GlobalExceptionHandler {
         return build(HttpStatus.NOT_FOUND, ex.getErrorCode(), ex.getMessage(), List.of(), request);
     }
 
+    @ExceptionHandler(org.springframework.http.converter.HttpMessageNotReadableException.class)
+    public ResponseEntity<ErrorResponse> handleMessageNotReadable(
+            org.springframework.http.converter.HttpMessageNotReadableException ex, HttpServletRequest request) {
+
+        return build(HttpStatus.BAD_REQUEST, "FORMATO_INVALIDO",
+                "O formato dos dados enviados é inválido ou contém um valor de Enum não permitido.",
+                List.of(), request);
+    }
+
     @ExceptionHandler(AuthenticationException.class)
     public ResponseEntity<ErrorResponse> handleAuthentication(AuthenticationException ex, HttpServletRequest request) {
-        return build(HttpStatus.UNAUTHORIZED, "CREDENCIAIS_INVALIDAS",
-                "E-mail ou senha inválidos.", List.of(), request);
+        // Unificado: você pode ajustar a mensagem conforme a necessidade da sua regra de negócio
+        return build(HttpStatus.UNAUTHORIZED, "NAO_AUTENTICADO",
+                "Autenticação necessária ou credenciais inválidas.", List.of(), request);
     }
 
     @ExceptionHandler(BusinessRuleException.class)
@@ -40,6 +51,14 @@ public class GlobalExceptionHandler {
 
         return build(HttpStatus.UNPROCESSABLE_ENTITY, "VALIDACAO_FALHOU",
                 "Um ou mais campos são inválidos.", details, request);
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<ErrorResponse> handleAccessDenied(
+            AccessDeniedException ex, HttpServletRequest request) {
+        return build(HttpStatus.FORBIDDEN, "ACESSO_NEGADO",
+                "Você não tem permissão para acessar este recurso.",
+                List.of(), request);
     }
 
     @ExceptionHandler(Exception.class)

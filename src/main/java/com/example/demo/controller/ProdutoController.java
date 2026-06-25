@@ -1,9 +1,14 @@
 package com.example.demo.controller;
 
 import com.example.demo.dtos.produto.ProdutoCatalogoResponseDto;
+import com.example.demo.dtos.produto.ProdutoDto;
+import com.example.demo.exceptions.BusinessRuleException;
 import com.example.demo.exceptions.ResourceNotFoundException;
 import com.example.demo.model.Produto;
 import com.example.demo.services.ProdutoService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Optional;
 
+@Tag(name = "Produtos", description = "Catálogo de produtos da rede - operações restritas ao ADMIN")
 @RestController
 @RequestMapping("produtos")
 public class ProdutoController {
@@ -23,25 +29,39 @@ public class ProdutoController {
         this.produtoService = produtoService;
     }
 
-    @PostMapping("/produtos")
+    @Operation(summary = "Lista todos os produtos do catálogo")
+    @ApiResponse(responseCode = "200", description = "Lista retornada com sucesso")
+    @GetMapping
+    public ResponseEntity<List<ProdutoCatalogoResponseDto>> listar() {
+        var produtos = produtoService.getAllProducts().stream()
+                .map(ProdutoCatalogoResponseDto::new)
+                .toList();
+        return ResponseEntity.ok(produtos);
+    }
+
+    @Operation(summary = "Cadastra novo produto no catálogo - somente ADMIN")
+    @ApiResponse(responseCode = "201", description = "Produto criado")
+    @ApiResponse(responseCode = "409", description = "Produto com mesmo nome já existe")
+    @ApiResponse(responseCode = "422", description = "Campos inválidos")
+    @PostMapping()
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<?> create(@RequestBody @Valid ProdutoCatalogoResponseDto data) {
+    public ResponseEntity<ProdutoCatalogoResponseDto> criar(@RequestBody @Valid ProdutoDto data) {
         if(produtoService.existsByNome(data.nome())){
-            return ResponseEntity.status(HttpStatus.CONFLICT).body("Conflict: Produto já existe!");
+            throw new BusinessRuleException("PRODUTO_JA_EXISTE", "Produto já existe");
         }
         var produto = new Produto();
         produto.setNome(data.nome());
         produto.setDescricao(data.descricao());
-        return ResponseEntity.status(HttpStatus.CREATED).body(new ProdutoCatalogoResponseDto(produto));
-
-        // checar duplicidade (existsByNome) -> 409 se já existir
-        // mapear DTO -> Produto, salvar
-        // devolver 201 Created
+        var saved = produtoService.saveProduto(produto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(new ProdutoCatalogoResponseDto(saved));
     }
 
-    @PutMapping("/produtos/{id}")
+    @Operation(summary = "Atualiza nome/descrição de um produto - somente ADMIN")
+    @ApiResponse(responseCode = "200", description = "Produto atualizado")
+    @ApiResponse(responseCode = "404", description = "Produto não encontrado")
+    @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<?> atualizar(@PathVariable Long id, @RequestBody @Valid ProdutoCatalogoResponseDto data) {
+    public ResponseEntity<ProdutoCatalogoResponseDto> atualizar(@PathVariable Long id, @RequestBody @Valid ProdutoDto data) {
             Optional<Produto> produtoOptional = produtoService.findById(id);
             if (produtoOptional.isEmpty()) {
                 throw new ResourceNotFoundException("PRODUTO_NAO_ENCONTRADO", "Produto não encontrado");
@@ -50,20 +70,16 @@ public class ProdutoController {
             Produto produto = produtoOptional.get();
             produto.setNome(data.nome());
             produto.setDescricao(data.descricao());
-            return ResponseEntity.status(HttpStatus.OK).body(new ProdutoCatalogoResponseDto(produto));
-        }
-
-    @GetMapping
-    public ResponseEntity<List<ProdutoCatalogoResponseDto>> list() {
-        var produtos = produtoService.getAllProducts().stream()
-                .map(ProdutoCatalogoResponseDto::new)
-                .toList();
-        return ResponseEntity.ok(produtos);
+            var saved = produtoService.saveProduto(produto);
+            return ResponseEntity.status(HttpStatus.OK).body(new ProdutoCatalogoResponseDto(saved));
     }
 
-    @DeleteMapping("/produtos/{id}")
+    @Operation(summary = "Remove produto do catálogo - somente ADMIN")
+    @ApiResponse(responseCode = "204", description = "Produto removido")
+    @ApiResponse(responseCode = "404", description = "Produto não encontrado")
+    @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<?> delete(@PathVariable Long id) {
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
         Optional<Produto> produtoOptional = produtoService.findById(id);
         if (!produtoOptional.isPresent()) {
             throw new ResourceNotFoundException("PRODUTO_NAO_ENCONTRADO", "Produto não encontrado");

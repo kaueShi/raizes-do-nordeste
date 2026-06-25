@@ -29,13 +29,16 @@ public class SecurityConfig {
                         //Auth - público
                         .requestMatchers(HttpMethod.POST, "/auth/login").permitAll()
                         .requestMatchers(HttpMethod.POST, "/auth/register/cliente").permitAll()
-                        //.requestMatchers(HttpMethod.POST, "/auth/register/admin").permitAll() -> Método apenas para inserir admin no BD
+                        .requestMatchers(HttpMethod.POST, "/auth/register/admin").permitAll() //-> Método apenas para inserir admin no BD
 
                         //Swagger - público
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
 
                         //Cardápio público (cliente vê antes de fazer login)
                         .requestMatchers(HttpMethod.GET, "unidades/*/produtos").permitAll()
+
+                        //Consultar unidades público
+                        .requestMatchers(HttpMethod.GET, "/unidades").permitAll()
 
                         //Tudo mais exige autenticação (roles específicas via @PreAuthorize)
                         .anyRequest().authenticated()

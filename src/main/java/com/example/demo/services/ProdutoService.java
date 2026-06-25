@@ -1,5 +1,6 @@
 package com.example.demo.services;
 
+import com.example.demo.exceptions.ResourceNotFoundException;
 import com.example.demo.model.Produto;
 import com.example.demo.repository.ProdutoRepository;
 import com.example.demo.repository.ProdutoUnidadeRepository;
@@ -35,14 +36,16 @@ public class ProdutoService {
         return produtoRepository.findById(produtoId);
     }
 
-    public Produto getProductByNome(String nome) {
+    public Produto getProdutoByNome(String nome) {
         return produtoRepository.findByNome(nome)
-                .orElseThrow(() -> new RuntimeException("Procut not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("PRODUTO_NAO_ENCONTRADO",
+                        "Produto não encontrado: " + nome));
     }
 
-    public Produto getProductById(Long id) {
+    public Produto getProdutoById(Long id) {
         return produtoRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Procut not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("PRODUTO_NAO_ENCONTRADO",
+                        "Produto não encontrado: " + id));
     }
 
     public void delete(Produto produto) {
