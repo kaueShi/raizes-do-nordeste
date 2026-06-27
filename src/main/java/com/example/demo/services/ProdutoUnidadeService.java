@@ -12,7 +12,6 @@ public class ProdutoUnidadeService {
 
     private final ProdutoUnidadeRepository produtoUnidadeRepository;
 
-    // Constructor injection is preferred over @Autowired
     public ProdutoUnidadeService(ProdutoUnidadeRepository produtoUnidadeRepository){
         this.produtoUnidadeRepository = produtoUnidadeRepository;
     }

@@ -39,7 +39,7 @@ public class AuthenticationController {
     @Operation(summary = "Realiza login e retorna token JWT")
     @ApiResponse(responseCode = "200", description = "Login realizado com sucesso")
     @ApiResponse(responseCode = "401", description = "Credenciais inválidas")
-    @ApiResponse(responseCode = "422", description = "Campos inválidos")
+    @ApiResponse(responseCode = "400", description = "Formato inválido")
     @PostMapping("/login")
     public ResponseEntity<LoginResponseDto> login(@RequestBody @Valid AuthenticationDto data){
         var emailPassword = new UsernamePasswordAuthenticationToken(data.email(), data.password());
@@ -51,7 +51,7 @@ public class AuthenticationController {
 
 
 
-// -- Método utilizado apenas para incluit um usuário ADMIN no banco de dados
+    // -- Método utilizado apenas para incluir um usuário ADMIN no banco de dados
     @PostMapping("/register/admin")
     public ResponseEntity<UsuarioResponseDto> registerAdmin(@RequestBody @Valid RegisterDto data) {
         if(this.repository.findByEmail(data.email()) != null)
@@ -61,7 +61,6 @@ public class AuthenticationController {
         Usuario novoAdmin = new Usuario(data.nome(), data.email(), encryptedPassword, Roles.ROLE_ADMIN);
         this.repository.save(novoAdmin);
 
-        System.out.println(new BCryptPasswordEncoder().encode(data.senha()));
         return ResponseEntity.status(HttpStatus.CREATED).body(new UsuarioResponseDto(novoAdmin));
     }
 

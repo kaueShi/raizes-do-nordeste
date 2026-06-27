@@ -17,7 +17,6 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        // Altere aqui para buscar pelo email, já que o Spring passa o identificador (email) como email
         UserDetails usuario = usuarioRepository.findByEmail(email);
 
         if (usuario == null) {

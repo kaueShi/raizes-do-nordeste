@@ -15,7 +15,6 @@ public class ProdutoService {
     private final ProdutoRepository produtoRepository;
     private final ProdutoUnidadeRepository produtoUnidadeRepository;
 
-    // Constructor injection is preferred over @Autowired
     public ProdutoService(ProdutoRepository produtoRepository, ProdutoUnidadeRepository produtoUnidadeRepository){
             this.produtoRepository = produtoRepository;
         this.produtoUnidadeRepository = produtoUnidadeRepository;

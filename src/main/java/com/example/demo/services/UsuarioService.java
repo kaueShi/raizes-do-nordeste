@@ -10,7 +10,6 @@ public class UsuarioService {
 
     private final UsuarioRepository usuarioRepository;
 
-    // Constructor injection is preferred over @Autowired
     public UsuarioService(UsuarioRepository usuarioRepository) {
         this.usuarioRepository = usuarioRepository;
     }

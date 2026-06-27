@@ -3,11 +3,11 @@ package com.example.demo.exceptions;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-
-import javax.naming.AuthenticationException;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.access.AccessDeniedException;
 import java.time.Instant;
 import java.util.List;
@@ -31,9 +31,15 @@ public class GlobalExceptionHandler {
                 List.of(), request);
     }
 
+    @ExceptionHandler(BadCredentialsException.class)
+    public ResponseEntity<ErrorResponse> handleBadCredentials(
+            BadCredentialsException ex, HttpServletRequest request) {
+        return build(HttpStatus.UNAUTHORIZED, "CREDENCIAIS_INVALIDAS",
+                "E-mail ou senha inválidos.",
+                List.of(), request);
+    }
     @ExceptionHandler(AuthenticationException.class)
     public ResponseEntity<ErrorResponse> handleAuthentication(AuthenticationException ex, HttpServletRequest request) {
-        // Unificado: você pode ajustar a mensagem conforme a necessidade da sua regra de negócio
         return build(HttpStatus.UNAUTHORIZED, "NAO_AUTENTICADO",
                 "Autenticação necessária ou credenciais inválidas.", List.of(), request);
     }

@@ -1,11 +1,9 @@
--- 1. Inserindo o usuário ADMIN
--- A senha '123456' em hash BCrypt é: $2a$10$EblZqNptyYvcLm/VwDCVAuAw5QkEX/WjD.Z8Y.IopvJ3F9nEw3Y2S
 INSERT INTO tb_usuario (nome, email, senha, role)
-VALUES ('Administrador', 'admin@admin.com', '$2a$10$7L8XVlffpfBf1kAwSs2zmu7jt.J1MpXiON/dDeyVP3JWcgOGrUS8u', 'ROLE_ADMIN');
+VALUES ('Administrador', 'admin@admin.com', '$2a$10$P5j9S6N5SiZIcAdOXkpI8.3S4hhWePMOdjyXI/dSTFxWUMDGIiJcy', 'ROLE_ADMIN');
 
 -- 2. Inserindo uma Unidade padrão (Você precisa de uma unidade para vincular os produtos depois)
 INSERT INTO tb_unidade (nome, cidade, uf, cozinha_completa)
-VALUES ('Matriz Hortolândia', 'Hortolândia', 'SP', true);
+VALUES ('Matriz Recife', 'Recife', 'PE', true);
 
 -- Inserindo pratos típicos do Nordeste
 INSERT INTO tb_produto (nome, descricao) VALUES

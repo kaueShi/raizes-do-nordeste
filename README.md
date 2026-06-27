@@ -111,7 +111,28 @@ As migrations ficam em `src/main/resources/db/migration/` e são executadas em o
 | V7__insert_dados_iniciais.sql | Seed: usuário admin, uma unidade e 10 produtos |
 
 O seed (V7) insere automaticamente:
-- **Usuário admin:** `admin@admin.com` / senha `123456`
+## Criando o usuário Administrador
+
+O sistema não possui um admin pré-cadastrado via migration por questão
+de segurança — o hash de senha gerado pelo BCrypt varia a cada execução.
+
+Para criar o admin inicial, com a API rodando, execute:
+
+POST /auth/register/admin
+Content-Type: application/json
+
+{
+"nome": "Administrador",
+"email": "admin@admin.com",
+"senha": "SuaSenha@123",
+"role": "ROLE_ADMIN"
+}
+
+Após confirmar o cadastro (resposta 201), este endpoint deve ser
+desativado comentando sua liberação no SecurityConfig.java:
+
+// .requestMatchers(HttpMethod.POST, "/auth/register/admin").permitAll()
+
 - **Unidade:** Matriz Hortolândia (SP)
 - **10 produtos** nordestinos no catálogo
 

@@ -1,6 +1,3 @@
-/*DROP TABLE IF EXISTS tb_user CASCADE;
-DROP TABLE IF EXISTS flyway_schema_history CASCADE;
-*/
 CREATE EXTENSION IF NOT EXISTS "pgcrypto";
 
 CREATE TABLE tb_usuario

@@ -1,5 +1,3 @@
-/*DROP TABLE IF EXISTS tb_produto_unidade CASCADE;*/
-
 CREATE TABLE tb_produto_unidade
 (
     produto_unidade_id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY ,

@@ -41,6 +41,4 @@ public class Pagamento {
     @CreationTimestamp
     private LocalDateTime criadoEm;
 
-
-
 }

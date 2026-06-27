@@ -31,4 +31,5 @@ public class Unidade {
 
     @OneToMany(mappedBy = "unidade")
     private List<ProdutoUnidade> produtos = new ArrayList<>();
+
 }
