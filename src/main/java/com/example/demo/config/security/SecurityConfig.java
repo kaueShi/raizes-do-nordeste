@@ -1,5 +1,6 @@
 package com.example.demo.config.security;
 
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -24,6 +25,27 @@ public class SecurityConfig {
         return httpSecurity
                 .csrf(crsf -> crsf.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .exceptionHandling(exceptions -> exceptions
+                        .authenticationEntryPoint((request, response, authException) -> {
+                            response.setContentType("application/json;charset=UTF-8");
+                            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+
+                            String jsonPreenchido = String.format(
+                                    "{\"error\":\"TOKEN_AUSENTE_OU_INVALIDO\"," +
+                                            "\"message\":\"Acesso não autorizado - Token ausente ou inválido.\"," +
+                                            "\"details\":[]," +
+                                            "\"timestamp\":\"%s\"," +
+                                            "\"path\":\"%s\"," +
+                                            "\"traceId\":\"%s\"}",
+                                    java.time.Instant.now().toString(),
+                                    request.getRequestURI(),
+                                    java.util.UUID.randomUUID().toString()
+                            );
+
+                            response.getWriter().write(jsonPreenchido);
+                        })
+                )
+
                 .authorizeHttpRequests(authorize -> authorize
 
                         //Auth - público

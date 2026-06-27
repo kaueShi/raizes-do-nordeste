@@ -63,12 +63,10 @@
               }
             },
             "url": {
-              "raw": "http://localhost:8080/auth/login",
-              "protocol": "http",
+              "raw": "{{baseUrl}}/auth/login",
               "host": [
-                "localhost"
+                "{{baseUrl}}"
               ],
-              "port": "8080",
               "path": [
                 "auth",
                 "login"
@@ -79,9 +77,6 @@
         },
         {
           "name": "T02 - Acesso sem token (negativo))",
-          "protocolProfileBehavior": {
-            "disableBodyPruning": true
-          },
           "request": {
             "auth": {
               "type": "bearer",
@@ -95,24 +90,14 @@
             },
             "method": "GET",
             "header": [],
-            "body": {
-              "mode": "raw",
-              "raw": "",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            },
             "url": {
-              "raw": "http://localhost:8080/produtos",
-              "protocol": "http",
+              "raw": "{{baseUrl}}/pedidos/{{pedidoId}}",
               "host": [
-                "localhost"
+                "{{baseUrl}}"
               ],
-              "port": "8080",
               "path": [
-                "produtos"
+                "pedidos",
+                "{{pedidoId}}"
               ]
             }
           },
@@ -396,6 +381,19 @@
         },
         {
           "name": "Setup - criação do admin",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
           "request": {
             "auth": {
               "type": "bearer",
@@ -411,7 +409,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n    \"nome\": \"Ana Clara\",\r\n    \"email\": \"admin@adm.com\",\r\n    \"senha\": \"123456\",\r\n    \"role\": \"ROLE_ADMIN\"\r\n}\r\n",
+              "raw": "{\r\n    \"nome\": \"Admin\",\r\n    \"email\": \"admin@administrador.com\",\r\n    \"senha\": \"123456\",\r\n    \"role\": \"ROLE_ADMIN\"\r\n}\r\n",
               "options": {
                 "raw": {
                   "language": "json"
@@ -511,6 +509,52 @@
             "body": {
               "mode": "raw",
               "raw": "{\r\n    \"email\": \"neto@email.com\",\r\n    \"password\": \"2222\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Setup - login admin",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {\r",
+                  "    pm.environment.set(\"token\", pm.response.json().token);\r",
+                  "    console.log(\"Token salvo:\", pm.environment.get(\"token\"));\r",
+                  "}"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"email\": \"admin@administrador.com\",\r\n    \"password\": \"123456\"\r\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -777,7 +821,7 @@
               "bearer": [
                 {
                   "key": "token",
-                  "value": "{{json_web_token_012m}}",
+                  "value": "{{token_cliente}}",
                   "type": "string"
                 }
               ]
@@ -856,12 +900,10 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "http://localhost:8080/unidades/2/produtos",
-              "protocol": "http",
+              "raw": "{{baseUrl}}/unidades/2/produtos",
               "host": [
-                "localhost"
+                "{{baseUrl}}"
               ],
-              "port": "8080",
               "path": [
                 "unidades",
                 "2",

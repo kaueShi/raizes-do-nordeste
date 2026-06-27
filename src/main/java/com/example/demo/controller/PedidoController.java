@@ -9,6 +9,7 @@ import com.example.demo.model.Usuario;
 import com.example.demo.services.PedidoService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -39,6 +40,7 @@ public class PedidoController {
     @ApiResponse(responseCode = "422", description = "Campos inválidos ou canalPedido ausente")
     @PostMapping
     @PreAuthorize("hasAnyRole('CLIENTE', 'FUNCIONARIO')")
+    @SecurityRequirement(name = "bearerAuth")
     public ResponseEntity<PedidoResponseDto> criar(@AuthenticationPrincipal Usuario usuarioLogado, @RequestBody @Valid PedidoDto data) {
         Pedido pedido = pedidoService.criarPedido(usuarioLogado, data);
         return ResponseEntity.status(HttpStatus.CREATED).body(new PedidoResponseDto(pedido));
@@ -49,6 +51,7 @@ public class PedidoController {
     @ApiResponse(responseCode = "200", description = "Lista retornada")
     @GetMapping
     @PreAuthorize("hasAnyRole('ADMIN', 'FUNCIONARIO')")
+    @SecurityRequirement(name = "bearerAuth")
     public ResponseEntity<List<PedidoResponseDto>> listar(@RequestParam(required = false) CanalPedido canalPedido) {
         var pedidos = pedidoService.listar(canalPedido).stream().map(PedidoResponseDto::new).toList();
         return ResponseEntity.ok(pedidos);
@@ -60,6 +63,7 @@ public class PedidoController {
     @ApiResponse(responseCode = "403", description = "Pedido de outro cliente")
     @ApiResponse(responseCode = "404", description = "Pedido não encontrado")
     @GetMapping("/{id}")
+    @SecurityRequirement(name = "bearerAuth")
     public ResponseEntity<PedidoResponseDto> buscar(@PathVariable Long id,
                                     @AuthenticationPrincipal Usuario usuarioAutenticado) {
         Pedido pedido = pedidoService.buscarPorId(id, usuarioAutenticado);
@@ -72,6 +76,7 @@ public class PedidoController {
     @ApiResponse(responseCode = "409", description = "Transição de status inválida")
     @PatchMapping("/{id}/status")
     @PreAuthorize("hasAnyRole('ADMIN', 'FUNCIONARIO')")
+    @SecurityRequirement(name = "bearerAuth")
     public ResponseEntity<PedidoResponseDto> atualizarStatus(@PathVariable Long id, @RequestBody @Valid StatusUpdateDto data) {
         Pedido pedido = pedidoService.atualizarStatus(id, data.status());
         return ResponseEntity.ok(new PedidoResponseDto(pedido));

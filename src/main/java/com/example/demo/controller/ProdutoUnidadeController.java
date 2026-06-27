@@ -13,6 +13,7 @@ import com.example.demo.services.ProdutoUnidadeService;
 import com.example.demo.services.UnidadeService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -54,6 +55,7 @@ public class ProdutoUnidadeController {
     @ApiResponse(responseCode = "409", description = "Produto já vinculado a esta unidade")
     @PostMapping
     @PreAuthorize("hasAnyRole('ADMIN', 'FUNCIONARIO')")
+    @SecurityRequirement(name = "bearerAuth")
     public ResponseEntity<ProdutoResponseDto> vincular(@PathVariable Long unidadeId, @RequestBody @Valid ProdutoUnidadeDto data) {
 
         Unidade unidade = unidadeService.findById(unidadeId)
@@ -80,6 +82,7 @@ public class ProdutoUnidadeController {
     @ApiResponse(responseCode = "404", description = "Vínculo não encontrado")
     @PutMapping("/{produtoUnidadeId}")
     @PreAuthorize("hasAnyRole('ADMIN', 'FUNCIONARIO')")
+    @SecurityRequirement(name = "bearerAuth")
     public ResponseEntity<ProdutoResponseDto> atualizar(@PathVariable Long unidadeId, @PathVariable Long produtoUnidadeId,
                                        @RequestBody @Valid ProdutoUnidadeDto data) {
         ProdutoUnidade produtoUnidade = produtoUnidadeService.buscarVinculoValido(unidadeId, produtoUnidadeId);
@@ -95,6 +98,7 @@ public class ProdutoUnidadeController {
     @ApiResponse(responseCode = "404", description = "Vínculo não encontrado")
     @PatchMapping("/{produtoUnidadeId}/desativar")
     @PreAuthorize("hasAnyRole('ADMIN', 'FUNCIONARIO')")
+    @SecurityRequirement(name = "bearerAuth")
     public ResponseEntity<ProdutoResponseDto> desativar(@PathVariable Long unidadeId, @PathVariable Long produtoUnidadeId) {
         ProdutoUnidade produtoUnidade = produtoUnidadeService.buscarVinculoValido(unidadeId, produtoUnidadeId);
         produtoUnidade.setDisponivel(false);
@@ -106,6 +110,7 @@ public class ProdutoUnidadeController {
     @ApiResponse(responseCode = "200", description = "Produto reativado")
     @PatchMapping("/{produtoUnidadeId}/reativar")
     @PreAuthorize("hasAnyRole('ADMIN', 'FUNCIONARIO')")
+    @SecurityRequirement(name = "bearerAuth")
     public ResponseEntity<ProdutoResponseDto> reativar(@PathVariable Long unidadeId, @PathVariable Long produtoUnidadeId) {
         ProdutoUnidade produtoUnidade = produtoUnidadeService.buscarVinculoValido(unidadeId, produtoUnidadeId);
         produtoUnidade.setDisponivel(true);

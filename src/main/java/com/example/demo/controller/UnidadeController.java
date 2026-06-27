@@ -7,6 +7,7 @@ import com.example.demo.model.Unidade;
 import com.example.demo.services.UnidadeService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -43,6 +44,7 @@ public class UnidadeController {
     @ApiResponse(responseCode = "403", description = "Sem permissão")
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
+    @SecurityRequirement(name = "bearerAuth")
     public ResponseEntity<UnidadeResponseDto> criar(@RequestBody @Valid UnidadeDto data) {
         if(unidadeService.existsByNome(data.nome())){
             throw new BusinessRuleException("UNIDADE_DUPLICADA", "Já existe uma unidade com este nome.");

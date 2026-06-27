@@ -8,6 +8,7 @@ import com.example.demo.model.Produto;
 import com.example.demo.services.ProdutoService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -45,6 +46,7 @@ public class ProdutoController {
     @ApiResponse(responseCode = "422", description = "Campos inválidos")
     @PostMapping()
     @PreAuthorize("hasRole('ADMIN')")
+    @SecurityRequirement(name = "bearerAuth")
     public ResponseEntity<ProdutoCatalogoResponseDto> criar(@RequestBody @Valid ProdutoDto data) {
         if(produtoService.existsByNome(data.nome())){
             throw new BusinessRuleException("PRODUTO_JA_EXISTE", "Produto já existe");
@@ -61,6 +63,7 @@ public class ProdutoController {
     @ApiResponse(responseCode = "404", description = "Produto não encontrado")
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
+    @SecurityRequirement(name = "bearerAuth")
     public ResponseEntity<ProdutoCatalogoResponseDto> atualizar(@PathVariable Long id, @RequestBody @Valid ProdutoDto data) {
             Optional<Produto> produtoOptional = produtoService.findById(id);
             if (produtoOptional.isEmpty()) {
@@ -79,6 +82,7 @@ public class ProdutoController {
     @ApiResponse(responseCode = "404", description = "Produto não encontrado")
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
+    @SecurityRequirement(name = "bearerAuth")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         Optional<Produto> produtoOptional = produtoService.findById(id);
         if (!produtoOptional.isPresent()) {

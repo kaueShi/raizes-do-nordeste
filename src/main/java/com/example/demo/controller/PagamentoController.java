@@ -7,6 +7,7 @@ import com.example.demo.model.Usuario;
 import com.example.demo.services.PagamentoService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -16,6 +17,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @Tag(name = "Pagamento", description = "Processamento de pagamento mock - sem integração real")
+@SecurityRequirement(name = "bearerAuth")
 @RestController
 @RequestMapping("pedidos/{pedidoId}/pagamento")
 public class PagamentoController {
